@@ -1,9 +1,11 @@
 package com.eanurag.interfaces;
 
+import java.sql.Connection;
+
 public interface IDAO {
-	void getDBInstance();
+	Connection getDBInstance();
 
 	void writeData();
 
-	void readData();
+	void readData(String query);
 }
