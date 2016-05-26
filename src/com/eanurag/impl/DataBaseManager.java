@@ -8,15 +8,13 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.eanurag.interfaces.IDAO;
+public class DataBaseManager {
 
-public class DataBaseManager implements IDAO {
-
-	private Connection connection = null;
-	private Statement statement = null;
-	private PreparedStatement preparedStatement = null;
-	private ResultSet resultSet = null;
-	private ResultSetMetaData metaData = null;
+	private static volatile Connection connection = null;
+	private static volatile Statement statement = null;
+	private static volatile PreparedStatement preparedStatement = null;
+	private static volatile ResultSet resultSet = null;
+	private static volatile ResultSetMetaData metaData = null;
 
 	private static final String DB_HOST = "localhost";
 	private static final String DB_PORT = "3306";
@@ -26,8 +24,7 @@ public class DataBaseManager implements IDAO {
 
 	private static final String SELECT_ALL_RECORDS = "SELECT * FROM `crawly`.`url`";
 
-	@Override
-	public Connection getDBInstance() {
+	public static Connection getDBInstance() {
 		if (null != connection) {
 			return connection;
 		} else {
@@ -53,7 +50,7 @@ public class DataBaseManager implements IDAO {
 		}
 	}
 
-	private void closeDBConnection() {
+	private static void closeDBConnection() {
 		try {
 			if (null != connection && !connection.isClosed()) {
 				connection.close();
@@ -63,32 +60,32 @@ public class DataBaseManager implements IDAO {
 		}
 	}
 
-	@Override
-	public void writeData() {
+	public static void writeData() {
 
 	}
 
-	@Override
-	public void readData(String query) {
+	public static ResultSet readData(String query) {
 		connection = getDBInstance();
+		statement = null;
+		resultSet = null;
 		try {
 			statement = connection.createStatement();
-			resultSet = statement.executeQuery(SELECT_ALL_RECORDS);
+			resultSet = statement.executeQuery(query);
 			if (resultSet != null) {
-				while (resultSet.next()) {
-					metaData = resultSet.getMetaData();
-					int columns = metaData.getColumnCount();
-					for (int i = 1; i <= columns; i++) {
-						System.out.println(resultSet.getString(i));
-					}
-
-				}
+				return resultSet;
 			}
-			closeDBConnection();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally {
+			closeDBConnection();
 		}
+		// TODO create an exception framework and return message
+		return null;
+	}
 
+	public static void buildDBCache() {
+		resultSet = readData(SELECT_ALL_RECORDS);
+		//TODO building cache
 	}
 
 }
