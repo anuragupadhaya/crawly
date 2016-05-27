@@ -1,14 +1,44 @@
 package com.eanurag.impl;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+//Executor Service will be a good candidate for Singleton class
 public class WorkerManager {
 	private static final Integer WORKER_LIMIT = 10;
 	private final ExecutorService executor = Executors.newFixedThreadPool(WORKER_LIMIT);
-	
-	private void getNewWorkerThread(){
-		executor.submit(new Scrapper());
+
+	// Singleton
+	private static volatile WorkerManager instance = null;
+
+	private WorkerManager() {
+	}
+
+	public static WorkerManager getInstance() {
+		if (instance == null) {
+			synchronized (WorkerManager.class) {
+				if (instance == null) {
+					instance = new WorkerManager();
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	// TODO can also be submit(Callable) if call() method needs to return a
+	// value
+	public Future getNewWorkerThread() {
+		return executor.submit(new Scrapper());
+	}
+
+	public void checkWorkerThread(Future future) throws InterruptedException, ExecutionException {
+		if (future.get() == null) {
+			// TODO add the actual handling code here and remove syso
+			System.out.println("Workere has finished");
+		}
 	}
 
 }
