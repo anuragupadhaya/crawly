@@ -7,8 +7,32 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.eanurag.objects.URL;
 
 public class DataBaseManager {
+
+	// TODO right now only 1 connection to db will be created
+	// making it singleton
+
+	private static volatile DataBaseManager dbInstance = null;
+
+	private DataBaseManager() {
+	}
+
+	public static DataBaseManager getInstance() {
+		if (dbInstance == null) {
+			synchronized (WorkerManager.class) {
+				if (dbInstance == null) {
+					dbInstance = new DataBaseManager();
+				}
+			}
+		}
+
+		return dbInstance;
+	}
 
 	private static volatile Connection connection = null;
 	private static volatile Statement statement = null;
@@ -21,17 +45,18 @@ public class DataBaseManager {
 	private static final String DB_USER = "root";
 	private static final String DB_PASS = "";
 	private static final String DB_NAME = "crawly";
+	private static final String URL_TABLE = "url";
 
 	private static final String SELECT_ALL_RECORDS = "SELECT * FROM `crawly`.`url`";
 
-	public static Connection getDBInstance() {
+	private static Map<Integer, String> dbCache = null;
+
+	public Connection getDBConnection() {
 		if (null != connection) {
 			return connection;
 		} else {
 			try {
-				// This will load the MySQL driver, each DB has its own driver
 				Class.forName("com.mysql.jdbc.Driver");
-				// Setup the connection with the DB
 				connection = DriverManager.getConnection("jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME,
 						DB_USER, DB_PASS);
 
@@ -50,7 +75,7 @@ public class DataBaseManager {
 		}
 	}
 
-	private static void closeDBConnection() {
+	private void closeDBConnection() {
 		try {
 			if (null != connection && !connection.isClosed()) {
 				connection.close();
@@ -60,12 +85,32 @@ public class DataBaseManager {
 		}
 	}
 
-	public static void writeData() {
+	public Boolean writeData(URL url) {
+		StringBuffer writeDBStatement = new StringBuffer();
+		writeDBStatement.append("insert into");
+		writeDBStatement.append(" ");
+		writeDBStatement.append(DB_NAME);
+		writeDBStatement.append(".");
+		writeDBStatement.append(URL_TABLE);
+		writeDBStatement.append(" ");
+		writeDBStatement.append("values (?,?,default)");
 
+		Boolean dbWriteResult = false;
+
+		try {
+			preparedStatement = DataBaseManager.getInstance().getDBConnection()
+					.prepareStatement(writeDBStatement.toString());
+			preparedStatement.setString(1, url.getURL());
+			preparedStatement.setString(2, String.valueOf(url.hashCode()));
+			dbWriteResult = (preparedStatement.executeUpdate() == 1) ? true : false;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return dbWriteResult;
 	}
 
-	public static ResultSet readData(String query) {
-		connection = getDBInstance();
+	public ResultSet readData(String query) {
+		connection = DataBaseManager.getInstance().getDBConnection();
 		statement = null;
 		resultSet = null;
 		try {
@@ -76,16 +121,24 @@ public class DataBaseManager {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
-			closeDBConnection();
+		} finally {
+			DataBaseManager.getInstance().closeDBConnection();
 		}
 		// TODO create an exception framework and return message
 		return null;
 	}
 
-	public static void buildDBCache() {
+	// TODO how to use the dbCache
+	public void buildDBCache() {
+		dbCache = new HashMap<Integer, String>();
 		resultSet = readData(SELECT_ALL_RECORDS);
-		//TODO building cache
+		try {
+			while (resultSet.next()) {
+				dbCache.put(resultSet.getInt(2), resultSet.getString(1));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
