@@ -1,21 +1,21 @@
 package com.eanurag.objects;
 
 public class URL {
-	private String URL;
+	private String url;
 
 	public String getURL() {
-		return URL;
+		return url;
 	}
 
 	public void setURL(String uRL) {
-		URL = uRL;
+		url = uRL;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((URL == null) ? 0 : URL.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
 
@@ -28,10 +28,10 @@ public class URL {
 		if (getClass() != obj.getClass())
 			return false;
 		URL other = (URL) obj;
-		if (URL == null) {
-			if (other.URL != null)
+		if (url == null) {
+			if (other.url != null)
 				return false;
-		} else if (!URL.equals(other.URL))
+		} else if (!url.equals(other.url))
 			return false;
 		return true;
 	}

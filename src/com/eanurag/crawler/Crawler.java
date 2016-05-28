@@ -1,11 +1,10 @@
-package com.eanurag.impl;
+package com.eanurag.crawler;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.eanurag.objects.URL;
+import com.eanurag.scaper.Scraper;
 
 public class Crawler implements Runnable {
 
@@ -13,18 +12,26 @@ public class Crawler implements Runnable {
 	private static final Integer CRAWLY_URL_VISITED_LIMIT = 100;
 
 	// TODO initialize the horizon from a property file
-	private ConcurrentLinkedQueue<URL> url_horizon = new ConcurrentLinkedQueue<URL>();
+	private ConcurrentLinkedQueue<URL> urlHorizon;
 
-	public ConcurrentLinkedQueue<URL> getUrl_horizon() {
-		return url_horizon;
+	public void setUrlHorizon(ConcurrentLinkedQueue<URL> urlHorizon) {
+		this.urlHorizon = urlHorizon;
+	}
+
+	public ConcurrentLinkedQueue<URL> getUrlHorizon() {
+		return urlHorizon;
 	}
 
 	// TODO make it concurrent
 	// Collections.newSetFromMap(new ConcurrentHashMap<URL, Boolean>());
-	private Set<URL> url_visited = new HashSet<URL>();
+	private Set<URL> urlVisited;
 
-	public Set<URL> getUrl_visited() {
-		return Collections.synchronizedSet(url_visited);
+	public void setUrlVisited(Set<URL> urlVisited) {
+		this.urlVisited = urlVisited;
+	}
+
+	public Set<URL> getUrlVisited() {
+		return urlVisited;
 	}
 
 	public Integer getCrawlyUrlHorizonLimit() {
@@ -38,31 +45,32 @@ public class Crawler implements Runnable {
 	@Override
 	public void run() {
 		URL url = nextURLFromHorizon();
-		scrap(url);
+		scrape(url);
 		addURLToVisited(url);
 
 	}
 
 	private URL nextURLFromHorizon() {
-		if (!getUrl_horizon().isEmpty()) {
-			URL url = url_horizon.poll();
-			if (!getUrl_visited().contains(url)) {
-				System.out.println("Horizon URL:" + url.getURL());
-				return url;
+		if (!getUrlHorizon().isEmpty()) {
+			URL url = urlHorizon.poll();
+			if (getUrlVisited().contains(url)) {
+				nextURLFromHorizon();
 			}
-			nextURLFromHorizon();
+			System.out.println("Horizon URL:" + url.getURL());
+			return url;
+
 		}
 		return null;
 
 	}
 
-	private void scrap(URL url) {
-		new Scrapper().scrap(url);
+	private void scrape(URL url) {
+		new Scraper().scrape(url);
 	}
 
 	private void addURLToVisited(URL url) {
 		System.out.println("Adding to visited set:" + url.getURL());
-		getUrl_visited().add(url);
+		getUrlVisited().add(url);
 	}
 
 }

@@ -34,7 +34,7 @@ public class WorkerManager {
 
 	// TODO can also be submit(Callable) if call() method needs to return a
 	// value
-	public Future submitNewWorkerThread(Runnable run) {
+	public Future createWorker(Runnable run) {
 		return executor.submit(run);
 	}
 

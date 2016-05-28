@@ -1,4 +1,4 @@
-package com.eanurag.impl;
+package com.eanurag.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.eanurag.impl.WorkerManager;
 import com.eanurag.objects.URL;
 
 public class DataBaseManager {

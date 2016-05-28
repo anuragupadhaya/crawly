@@ -1,10 +1,10 @@
-package com.eanurag.impl;
+package com.eanurag.scaper;
 
 import com.eanurag.objects.URL;
 
-public class Scrapper {
+public class Scraper {
 
-	public void scrap(URL url){
+	public void scrape(URL url){
 		//FIXME dummy job
 		System.out.println("Done scrapping:"+url.getURL());
 	}
