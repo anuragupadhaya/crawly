@@ -7,13 +7,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.eanurag.objects.URL;
 
-public class Crawler {
+public class Crawler implements Runnable {
 
 	private static final Integer CRAWLY_URL_HORIZON_LIMIT = 10;
 	private static final Integer CRAWLY_URL_VISITED_LIMIT = 100;
 
 	// TODO initialize the horizon from a property file
 	private ConcurrentLinkedQueue<URL> url_horizon = new ConcurrentLinkedQueue<URL>();
+
+	public ConcurrentLinkedQueue<URL> getUrl_horizon() {
+		return url_horizon;
+	}
 
 	// TODO make it concurrent
 	// Collections.newSetFromMap(new ConcurrentHashMap<URL, Boolean>());
@@ -23,12 +27,42 @@ public class Crawler {
 		return Collections.synchronizedSet(url_visited);
 	}
 
-	public static Integer getCrawlyUrlHorizonLimit() {
+	public Integer getCrawlyUrlHorizonLimit() {
 		return CRAWLY_URL_HORIZON_LIMIT;
 	}
 
-	public static Integer getCrawlyUrlVisitedLimit() {
+	public Integer getCrawlyUrlVisitedLimit() {
 		return CRAWLY_URL_VISITED_LIMIT;
+	}
+
+	@Override
+	public void run() {
+		URL url = nextURLFromHorizon();
+		scrap(url);
+		addURLToVisited(url);
+
+	}
+
+	private URL nextURLFromHorizon() {
+		if (!getUrl_horizon().isEmpty()) {
+			URL url = url_horizon.poll();
+			if (!getUrl_visited().contains(url)) {
+				System.out.println("Horizon URL:" + url.getURL());
+				return url;
+			}
+			nextURLFromHorizon();
+		}
+		return null;
+
+	}
+
+	private void scrap(URL url) {
+		new Scrapper().scrap(url);
+	}
+
+	private void addURLToVisited(URL url) {
+		System.out.println("Adding to visited set:" + url.getURL());
+		getUrl_visited().add(url);
 	}
 
 }
