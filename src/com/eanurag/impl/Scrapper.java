@@ -1,11 +1,12 @@
 package com.eanurag.impl;
 
-public class Scrapper implements Runnable{
+import com.eanurag.objects.URL;
 
-	@Override
-	public void run() {
-		
-		
+public class Scrapper {
+
+	public void scrap(URL url){
+		//FIXME dummy job
+		System.out.println("Done scrapping:"+url.getURL());
 	}
 
 }
