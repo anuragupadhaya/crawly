@@ -10,6 +10,10 @@ public class WorkerManager {
 	private static final Integer WORKER_LIMIT = 10;
 	private final ExecutorService executor = Executors.newFixedThreadPool(WORKER_LIMIT);
 
+	public ExecutorService getExecutor() {
+		return executor;
+	}
+
 	// Singleton
 	private static volatile WorkerManager instance = null;
 
@@ -30,14 +34,14 @@ public class WorkerManager {
 
 	// TODO can also be submit(Callable) if call() method needs to return a
 	// value
-	public Future getNewWorkerThread() {
-		return executor.submit(new Scrapper());
+	public Future submitNewWorkerThread(Runnable run) {
+		return executor.submit(run);
 	}
 
 	public void checkWorkerThread(Future future) throws InterruptedException, ExecutionException {
 		if (future.get() == null) {
 			// TODO add the actual handling code here and remove syso
-			System.out.println("Workere has finished");
+			System.out.println("Worker has finished");
 		}
 	}
 
