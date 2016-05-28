@@ -121,9 +121,10 @@ public class DataBaseManager {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} finally {
-			DataBaseManager.getInstance().closeDBConnection();
-		}
+		} 
+//			finally {
+//			DataBaseManager.getInstance().closeDBConnection();
+//		}
 		// TODO create an exception framework and return message
 		return null;
 	}
