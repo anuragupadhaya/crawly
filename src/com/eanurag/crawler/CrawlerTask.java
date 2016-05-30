@@ -15,11 +15,14 @@ public class CrawlerTask implements Callable {
 	Crawler crawler;
 
 	private void crawlTask() {
-		synchronized (crawler) {
-			if (!crawler.getUrlVisited().contains(url)) {
-				new Scraper().scrape(url);
-				crawler.addURLToVisited(url);
-			}
+
+		if (crawler.getUrlVisited().contains(url)) {
+			System.out.println("duplicate task caught in CrawlerTask");
+			return;
+		} else {
+			System.out.println("No duplicate task caught in CrawlerTask");
+			crawler.addURLToVisited(url);
+			new Scraper().scrape(url);
 		}
 
 	}
