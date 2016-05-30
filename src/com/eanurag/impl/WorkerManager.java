@@ -1,5 +1,6 @@
 package com.eanurag.impl;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,8 +35,8 @@ public class WorkerManager {
 
 	// TODO can also be submit(Callable) if call() method needs to return a
 	// value
-	public Future createWorker(Runnable run) {
-		return executor.submit(run);
+	public Future createWorker(Callable call) {
+		return executor.submit(call);
 	}
 
 	public void checkWorkerThread(Future future) throws InterruptedException, ExecutionException {
