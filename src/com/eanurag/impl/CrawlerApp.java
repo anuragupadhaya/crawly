@@ -23,15 +23,29 @@ public class CrawlerApp {
 		WorkerManager workers = WorkerManager.getInstance();
 		while (!crawler.getUrlHorizon().isEmpty()) {
 			URL url = crawler.getUrlHorizon().poll();
-			if(!crawler.getUrlVisited().contains(url)){
+			if (crawler.getUrlVisited().contains(url)) {
+				System.out.println("duplicate task caught in CrawlerApp");
+			} else {
+				System.out.println("New Thread");
 				Future future = workers.getExecutor().submit(new CrawlerTask(url, crawler));
+				workers.getFutures().add(future);
 			}
-			
+
+		}
+
+		try {
+			workers.checkWorkerThreads();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+		if (!crawler.getUrlHorizon().isEmpty()) {
+			startCrawling();
 		}
 
 		try {
 			workers.getExecutor().shutdown();
-			workers.getExecutor().awaitTermination(5, TimeUnit.SECONDS);
+			workers.getExecutor().awaitTermination(1, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
