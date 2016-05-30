@@ -12,7 +12,7 @@ public class Crawler {
 	private static final Integer CRAWLY_URL_HORIZON_LIMIT = 10;
 	private static final Integer CRAWLY_URL_VISITED_LIMIT = 100;
 
-	// TODO initialize the horizon from a property file
+	// TODO Check feasibility of LinkedBlockingQueue
 	private volatile ConcurrentLinkedQueue<URL> urlHorizon = new ConcurrentLinkedQueue<URL>();
 
 	public void setUrlHorizon(ConcurrentLinkedQueue<URL> urlHorizon) {
