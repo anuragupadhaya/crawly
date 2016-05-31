@@ -5,11 +5,15 @@ import java.util.Properties;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import com.eanurag.crawler.Crawler;
 import com.eanurag.crawler.CrawlerTask;
 import com.eanurag.objects.URL;
 
 public class CrawlerApp {
+
+	private final static Logger logger = Logger.getLogger(CrawlerApp.class);
 
 	private static Crawler crawler;
 
@@ -24,9 +28,9 @@ public class CrawlerApp {
 		while (!crawler.getUrlHorizon().isEmpty()) {
 			URL url = crawler.getUrlHorizon().poll();
 			if (crawler.getUrlVisited().contains(url)) {
-				System.out.println("duplicate task caught in CrawlerApp");
+				logger.warn("duplicate task caught in CrawlerApp");
 			} else {
-				System.out.println("New Thread");
+				logger.info("New Thread");
 				Future future = workers.getExecutor().submit(new CrawlerTask(url, crawler));
 				workers.getFutures().add(future);
 			}
@@ -34,9 +38,10 @@ public class CrawlerApp {
 		}
 
 		try {
+			Thread.sleep(2000);
 			workers.checkWorkerThreads();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			logger.error("Error in CrawlerApp:" + e);
 		}
 
 		if (!crawler.getUrlHorizon().isEmpty()) {
@@ -47,7 +52,7 @@ public class CrawlerApp {
 			workers.getExecutor().shutdown();
 			workers.getExecutor().awaitTermination(1, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error("Error in CrawlerApp:" + e);
 		}
 	}
 
@@ -62,8 +67,8 @@ public class CrawlerApp {
 				url.setURL(link);
 				crawler.getUrlHorizon().add(url);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			logger.error("Error in CrawlerApp:" + e);
 		}
 
 	}

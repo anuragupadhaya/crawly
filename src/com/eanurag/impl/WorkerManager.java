@@ -7,7 +7,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
+
 public class WorkerManager {
+	private final static Logger logger = Logger.getLogger(WorkerManager.class);
+
 	private static final Integer WORKER_LIMIT = 10;
 	private final ExecutorService executor = Executors.newFixedThreadPool(WORKER_LIMIT);
 
@@ -47,14 +51,14 @@ public class WorkerManager {
 			if (future.isDone()) {
 				// TODO add the code here to take the future.get()
 				// which will give the scrapped data and save it to db?
-				System.out.println("Worker has finished");
+				logger.info("Worker has finished");
 			} else {
 				Thread.sleep(100);
 				if (!future.isDone()) {
-					System.out.println("Cancelling worker");
+					logger.error("Cancelling worker");
 					future.cancel(true);
 				} else {
-					System.out.println("Worker has finished after waiting");
+					logger.warn("Worker has finished after waiting");
 				}
 			}
 		}

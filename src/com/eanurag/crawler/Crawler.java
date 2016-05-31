@@ -5,9 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
+
 import com.eanurag.objects.URL;
 
 public class Crawler {
+
+	private final static Logger logger = Logger.getLogger(Crawler.class);
 
 	private static final Integer CRAWLY_URL_HORIZON_LIMIT = 10;
 	private static final Integer CRAWLY_URL_VISITED_LIMIT = 100;
@@ -45,10 +49,10 @@ public class Crawler {
 
 	public void addURLToVisited(URL url) {
 		if (getUrlVisited().contains(url)) {
-			System.out.println("Duplicate found in already visited:" + url.getURL());
+			logger.warn("Duplicate found in already visited:" + url.getURL());
 			return;
 		} else {
-			System.out.println("Adding to visited set:" + url.getURL());
+			logger.info("Adding to visited set:" + url.getURL());
 			getUrlVisited().add(url);
 		}
 	}

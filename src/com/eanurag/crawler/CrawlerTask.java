@@ -2,10 +2,15 @@ package com.eanurag.crawler;
 
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
+
 import com.eanurag.objects.URL;
 import com.eanurag.scaper.Scraper;
 
 public class CrawlerTask implements Callable {
+
+	private final static Logger logger = Logger.getLogger(CrawlerTask.class);
+
 	public CrawlerTask(URL url, Crawler crawler) {
 		this.url = url;
 		this.crawler = crawler;
@@ -17,10 +22,9 @@ public class CrawlerTask implements Callable {
 	private void crawlTask() {
 
 		if (crawler.getUrlVisited().contains(url)) {
-			System.out.println("duplicate task caught in CrawlerTask");
-			return;
+			logger.warn("duplicate task caught in CrawlerTask");
 		} else {
-			System.out.println("No duplicate task caught in CrawlerTask");
+			logger.info("No duplicate task caught in CrawlerTask");
 			crawler.addURLToVisited(url);
 			new Scraper().scrape(url);
 		}
