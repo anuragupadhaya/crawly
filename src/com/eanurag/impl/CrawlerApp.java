@@ -41,7 +41,7 @@ public class CrawlerApp {
 			Thread.sleep(2000);
 			workers.checkWorkerThreads();
 		} catch (InterruptedException e) {
-			logger.error("Error in CrawlerApp:" + e);
+			logger.error("Error in CrawlerApp:", e);
 		}
 
 		if (!crawler.getUrlHorizon().isEmpty()) {
@@ -52,7 +52,7 @@ public class CrawlerApp {
 			workers.getExecutor().shutdown();
 			workers.getExecutor().awaitTermination(1, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			logger.error("Error in CrawlerApp:" + e);
+			logger.error("Error in CrawlerApp:", e);
 		}
 	}
 
@@ -68,7 +68,7 @@ public class CrawlerApp {
 				crawler.getUrlHorizon().add(url);
 			}
 		} catch (Exception e) {
-			logger.error("Error in CrawlerApp:" + e);
+			logger.error("Error in CrawlerApp:", e);
 		}
 
 	}
