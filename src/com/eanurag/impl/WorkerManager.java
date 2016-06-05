@@ -2,12 +2,18 @@ package com.eanurag.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
+
+import com.eanurag.crawler.Crawler;
+import com.eanurag.objects.ScrapedURL;
+import com.eanurag.objects.URL;
 
 public class WorkerManager {
 	private final static Logger logger = Logger.getLogger(WorkerManager.class);
@@ -19,18 +25,21 @@ public class WorkerManager {
 		return executor;
 	}
 
-	private List<Future> futures = new ArrayList<Future>();
+	private List<Future<ScrapedURL>> futures = new ArrayList<Future<ScrapedURL>>();
+
+	private Crawler crawler;
 
 	private static volatile WorkerManager instance = null;
 
-	private WorkerManager() {
+	private WorkerManager(Crawler crawler) {
+		this.crawler = crawler;
 	}
 
-	public static WorkerManager getInstance() {
+	public static WorkerManager getInstance(Crawler crawler) {
 		if (instance == null) {
 			synchronized (WorkerManager.class) {
 				if (instance == null) {
-					instance = new WorkerManager();
+					instance = new WorkerManager(crawler);
 				}
 			}
 		}
@@ -38,22 +47,25 @@ public class WorkerManager {
 		return instance;
 	}
 
-	public Future createWorker(Callable call) {
+	public Future<Set<URL>> createWorker(Callable<Set<URL>> call) {
 		return executor.submit(call);
 	}
 
-	public List<Future> getFutures() {
+	public List<Future<ScrapedURL>> getFutures() {
 		return futures;
 	}
 
-	public void checkWorkerThreads() throws InterruptedException {
-		for (Future future : getFutures()) {
+	public void checkWorkerThreads() throws InterruptedException, ExecutionException {
+		for (Future<ScrapedURL> future : getFutures()) {
 			if (future.isDone()) {
 				// TODO add the code here to take the future.get()
 				// which will give the scrapped data and save it to db?
 				logger.info("Worker has finished");
+				for (URL url : future.get().getScrapedLinks()) {
+					crawler.getUrlHorizon().add(url);
+				}
 			} else {
-				Thread.sleep(100);
+				Thread.sleep(1000);
 				if (!future.isDone()) {
 					logger.error("Cancelling worker");
 					future.cancel(true);

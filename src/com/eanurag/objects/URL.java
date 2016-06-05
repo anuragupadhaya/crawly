@@ -2,13 +2,27 @@ package com.eanurag.objects;
 
 public class URL {
 	private String url;
+	
+	private ScrapedURL links = new ScrapedURL();
+
+	public ScrapedURL getLinks() {
+		return links;
+	}
+
+	public void setLinks(ScrapedURL links) {
+		this.links = links;
+	}
+
+	public URL(String url){
+		this.url = url;
+	}
 
 	public String getURL() {
 		return url;
 	}
 
-	public void setURL(String uRL) {
-		url = uRL;
+	public void setURL(String url) {
+		this.url = url;
 	}
 
 	@Override
