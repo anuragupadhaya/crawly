@@ -1,7 +1,8 @@
 package com.eanurag.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +20,26 @@ public class CrawlerApp {
 
 	private static Crawler crawler;
 
+	private static List<String> filters = new ArrayList<String>();
+
 	public static void main(String[] args) {
 		crawler = new Crawler();
 		initializeApp();
+		initializeFilterList();
 		startCrawling();
+	}
+
+	private static void initializeFilterList() {
+		Properties config = new Properties();
+		try {
+			config.load(CrawlerApp.class.getClassLoader().getResourceAsStream("filters.properties"));
+			for (String filter : config.getProperty("filters").split(",")) {
+				filters.add(filter);
+			}
+		} catch (Exception e) {
+			logger.error("Error in initializing filter list in CrawlerApp:", e);
+		}
+
 	}
 
 	private static void startCrawling() {
@@ -31,6 +48,8 @@ public class CrawlerApp {
 			URL url = crawler.getUrlHorizon().poll();
 			if (crawler.getUrlVisited().contains(url)) {
 				logger.warn("duplicate task caught in CrawlerApp");
+			} else if (isURLfiltered(url)) {
+				logger.warn("filtered URL" + url.getURL());
 			} else {
 				logger.info("New Thread");
 				Future<ScrapedURL> future = workers.getExecutor().submit(new CrawlerTask(url, crawler));
@@ -60,6 +79,15 @@ public class CrawlerApp {
 		}
 	}
 
+	private static boolean isURLfiltered(URL url) {
+		for (String filter : filters) {
+			if (url.getURL().contains(filter + ".")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static void initializeApp() {
 
 		Properties config = new Properties();
@@ -71,7 +99,7 @@ public class CrawlerApp {
 				crawler.getUrlHorizon().add(url);
 			}
 		} catch (Exception e) {
-			logger.error("Error in CrawlerApp:", e);
+			logger.error("Error in initializing URL Horizon in CrawlerApp:", e);
 		}
 
 	}
