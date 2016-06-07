@@ -33,7 +33,7 @@ public class CrawlerApp {
 		Properties config = new Properties();
 		try {
 			config.load(CrawlerApp.class.getClassLoader().getResourceAsStream("filters.properties"));
-			for (String filter : config.getProperty("filters").split(",")) {
+			for (String filter : config.getProperty("filters").split("\\s+")) {
 				filters.add(filter);
 			}
 		} catch (Exception e) {
