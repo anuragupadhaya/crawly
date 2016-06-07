@@ -26,12 +26,12 @@ public class Scraper {
 			Elements links = doc.getElementsByTag("a");
 
 			for (Element link : links) {
-				logger.info(link.attr("href"));
-				scrapedLinks.getScrapedLinks().add(new URL(link.attr("href")));
+				logger.info(link.attr("abs:href"));
+				scrapedLinks.getScrapedLinks().add(new URL(link.attr("abs:href")));
 			}
 
 		} catch (Exception e) {
-			logger.error("Error in Scrapper",e);
+			logger.error("Error in Scrapper:"+url.getURL(),e);
 		}
 		
 		return scrapedLinks;

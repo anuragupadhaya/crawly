@@ -25,7 +25,7 @@ public class CrawlerTask implements Callable<ScrapedURL> {
 		ScrapedURL scrapedlinks = url.getLinks();
 
 		if (crawler.getUrlVisited().contains(url)) {
-			logger.warn("duplicate task caught in CrawlerTask");
+			logger.warn("duplicate task caught in CrawlerTask:"+url.getURL());
 		} else {
 			logger.info("No duplicate task caught in CrawlerTask");
 			crawler.addURLToVisited(url);
