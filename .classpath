@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="dependencies/mysql-connector-java-5.1.39-bin.jar"/>
 	<classpathentry kind="lib" path="dependencies/jsoup-1.9.2.jar"/>
 	<classpathentry kind="lib" path="dependencies/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="dependencies/c3p0-0.9.5.2.jar"/>
+	<classpathentry kind="lib" path="dependencies/mchange-commons-java-0.2.11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
