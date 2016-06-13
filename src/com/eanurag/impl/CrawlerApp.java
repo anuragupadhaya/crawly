@@ -47,7 +47,7 @@ public class CrawlerApp {
 		while (!crawler.getUrlHorizon().isEmpty()) {
 			URL url = crawler.getUrlHorizon().poll();
 			if (crawler.getUrlVisited().contains(url)) {
-				logger.warn("duplicate task caught in CrawlerApp");
+				logger.warn("duplicate task caught in CrawlerApp:"+url.getURL());
 			} else if (isURLfiltered(url)) {
 				logger.warn("filtered URL" + url.getURL());
 			} else {
