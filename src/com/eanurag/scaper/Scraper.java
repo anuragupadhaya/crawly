@@ -26,7 +26,7 @@ public class Scraper {
 			Elements links = doc.getElementsByTag("a");
 
 			for (Element link : links) {
-				logger.info(link.attr("abs:href"));
+//				logger.info(link.attr("abs:href"));
 				scrapedLinks.getScrapedLinks().add(new URL(link.attr("abs:href")));
 			}
 
