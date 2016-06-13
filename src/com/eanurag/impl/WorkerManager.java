@@ -58,11 +58,14 @@ public class WorkerManager {
 	public void checkWorkerThreads() throws InterruptedException, ExecutionException {
 		for (Future<ScrapedURL> future : getFutures()) {
 			if (future.isDone()) {
-				// TODO add the code here to take the future.get()
-				// which will give the scrapped data and save it to db?
 				logger.info("Worker has finished");
 				for (URL url : future.get().getScrapedLinks()) {
-					crawler.getUrlHorizon().add(url);
+					if (!crawler.getUrlHorizon().contains(url)) {
+						crawler.getUrlHorizon().add(url);
+					}
+					else{
+						logger.warn("duplicate task caught in WorkerManager:"+url.getURL());
+					}
 				}
 			} else {
 				Thread.sleep(1000);
