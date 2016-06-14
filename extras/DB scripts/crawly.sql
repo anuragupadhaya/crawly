@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 26, 2016 at 09:48 PM
+-- Generation Time: Jun 14, 2016 at 05:01 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 5.6.21
 
@@ -21,12 +21,19 @@ USE `crawly`;
 --
 -- Table structure for table `url`
 --
+-- Creation: Jun 13, 2016 at 09:56 PM
+--
 
 DROP TABLE IF EXISTS `url`;
 CREATE TABLE IF NOT EXISTS `url` (
   `url` varchar(500) NOT NULL DEFAULT '',
-  `hashCode` char(20) NOT NULL DEFAULT '',
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`),
-  KEY `hashCode` (`hashCode`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `link` varchar(500) NOT NULL,
+  `hashCode` int(100) NOT NULL,
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`hashCode`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2946603 DEFAULT CHARSET=utf8;
+
+--
+-- RELATIONS FOR TABLE `url`:
+--
