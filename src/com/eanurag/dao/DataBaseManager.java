@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.eanurag.impl.WorkerManager;
+import com.eanurag.objects.ScrapedURL;
 import com.eanurag.objects.URL;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -73,7 +74,7 @@ public class DataBaseManager {
 		return this.cpds.getConnection();
 	}
 
-	public Boolean writeData(URL url) {
+	public void writeData(URL url) throws SQLException {
 		StringBuffer writeDBStatement = new StringBuffer();
 		writeDBStatement.append("insert into");
 		writeDBStatement.append(" ");
@@ -81,7 +82,7 @@ public class DataBaseManager {
 		writeDBStatement.append(".");
 		writeDBStatement.append(URL_TABLE);
 		writeDBStatement.append(" ");
-		writeDBStatement.append("values (?,?,default)");
+		writeDBStatement.append("values (?,?,?,default)");
 
 		Boolean dbWriteResult = false;
 		Connection connection = null;
@@ -89,15 +90,25 @@ public class DataBaseManager {
 
 		try {
 			connection = DataBaseManager.getInstance().getConnection();
+			connection.setAutoCommit(false);
 			preparedStatement = connection.prepareStatement(writeDBStatement.toString());
-			preparedStatement.setString(1, url.getURL());
-			preparedStatement.setString(2, String.valueOf(url.hashCode()));
-			dbWriteResult = (preparedStatement.executeUpdate() == 1) ? true : false;
-			if (dbWriteResult) {
-				logger.info("Successfully written to DB!");
+			ScrapedURL links = url.getLinks();
+			for (URL link : links.getScrapedLinks()) {
+				preparedStatement.setString(1, url.getURL());
+				preparedStatement.setString(2, link.getURL());
+				preparedStatement.setString(3, String.valueOf(link.hashCode()));
+				preparedStatement.addBatch();
 			}
+			preparedStatement.executeBatch();
+			connection.commit();
+			// dbWriteResult = (preparedStatement.executeUpdate() == 1) ? true :
+			// false;
+			// if (dbWriteResult) {
+			// logger.info("Successfully written to DB!");
+			// }
 		} catch (SQLException e) {
 			logger.error("Error in writing to DB", e);
+			connection.rollback();
 		} finally {
 			try {
 				preparedStatement.close();
@@ -106,7 +117,7 @@ public class DataBaseManager {
 				e.printStackTrace();
 			}
 		}
-		return dbWriteResult;
+		// return dbWriteResult;
 	}
 
 	public boolean checkURLinDB(URL url) {
