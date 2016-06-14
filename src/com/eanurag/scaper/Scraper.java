@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.eanurag.dao.DataBaseManager;
 import com.eanurag.objects.ScrapedURL;
 import com.eanurag.objects.URL;
 
@@ -29,6 +30,8 @@ public class Scraper {
 //				logger.info(link.attr("abs:href"));
 				scrapedLinks.getScrapedLinks().add(new URL(link.attr("abs:href")));
 			}
+			url.setLinks(scrapedLinks);
+			DataBaseManager.getInstance().writeData(url);
 
 		} catch (Exception e) {
 			logger.error("Error in Scrapper:"+url.getURL(),e);
