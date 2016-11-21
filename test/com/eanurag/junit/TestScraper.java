@@ -9,7 +9,7 @@ import com.eanurag.scaper.Scraper;
 
 public class TestScraper {
 	
-	URL url = new URL();
+	/*URL url = new URL();
 	
 	Scraper scraper = new Scraper();
 
@@ -26,5 +26,5 @@ public class TestScraper {
 		url.setURL("https://en.wikipedia.org/wiki/MD5");
 		scraper.scrape(url);
 	}
-
+*/
 }

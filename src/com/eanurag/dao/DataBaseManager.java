@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -14,29 +13,42 @@ import org.apache.log4j.Logger;
 import com.eanurag.impl.WorkerManager;
 import com.eanurag.objects.ScrapedURL;
 import com.eanurag.objects.URL;
+import com.eanurag.utils.Constants;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DataBaseManager {
 
-	private final static Logger logger = Logger.getLogger(DataBaseManager.class);
+	private final static Logger logger = Logger
+			.getLogger(DataBaseManager.class);
 
 	private volatile static DataBaseManager dbInstance = null;
+
+	private ComboPooledDataSource cpds;
+
+	private static String host;
+	private static String port;
+	private static String user;
+	private static String pass;
+	private static String db_name;
+	private static String url_table;
+
+	private static final String SELECT_ALL_RECORDS = "SELECT * FROM `crawly`.`url`";
 
 	private DataBaseManager() {
 		cpds = new ComboPooledDataSource();
 		try {
-			cpds.setDriverClass("com.mysql.jdbc.Driver");
+			cpds.setDriverClass(Constants.DRIVER_CLASS);
 		} catch (PropertyVetoException e) {
 			logger.error("Error in Initializing DB Driver class", e);
 		}
-		cpds.setJdbcUrl("jdbc:mysql://" + DB_HOST + "/" + DB_NAME);
-		cpds.setUser(DB_USER);
-		cpds.setPassword(DB_PASS);
+		cpds.setJdbcUrl(Constants.DRIVER_PROTOCOL + host + "/" + db_name);
+		cpds.setUser(user);
+		cpds.setPassword(pass);
 
-		cpds.setMinPoolSize(MINIMUM_POOL_SIZE);
-		cpds.setAcquireIncrement(INCREMENT_SIZE);
-		cpds.setMaxPoolSize(MAXIMUM_POOL_SIZE);
-		cpds.setMaxStatements(MAX_STATEMENTS);
+		cpds.setMinPoolSize(Constants.DBPOOL_MINIMUM_POOL_SIZE);
+		cpds.setAcquireIncrement(Constants.DBPOOL_INCREMENT_SIZE);
+		cpds.setMaxPoolSize(Constants.DBPOOL_MAXIMUM_POOL_SIZE);
+		cpds.setMaxStatements(Constants.DBPOOL_MAXIMUM_POOL_SIZE);
 	}
 
 	public static DataBaseManager getInstance() {
@@ -51,24 +63,6 @@ public class DataBaseManager {
 		return dbInstance;
 	}
 
-	private ComboPooledDataSource cpds;
-
-	private static final Integer MINIMUM_POOL_SIZE = 10;
-	private static final Integer MAXIMUM_POOL_SIZE = 1000;
-	private static final Integer INCREMENT_SIZE = 5;
-	private static final Integer MAX_STATEMENTS = 200;
-
-	private static final String DB_HOST = "localhost";
-	private static final String DB_PORT = "3306";
-	private static final String DB_USER = "root";
-	private static final String DB_PASS = "";
-	private static final String DB_NAME = "crawly";
-	private static final String URL_TABLE = "url";
-
-	private static final String SELECT_ALL_RECORDS = "SELECT * FROM `crawly`.`url`";
-
-	private static Map<Integer, String> dbCache = null;
-
 	public Connection getConnection() throws SQLException {
 		logger.info("Creating connection to DB!");
 		return this.cpds.getConnection();
@@ -78,9 +72,9 @@ public class DataBaseManager {
 		StringBuffer writeDBStatement = new StringBuffer();
 		writeDBStatement.append("insert into");
 		writeDBStatement.append(" ");
-		writeDBStatement.append(DB_NAME);
+		writeDBStatement.append(db_name);
 		writeDBStatement.append(".");
-		writeDBStatement.append(URL_TABLE);
+		writeDBStatement.append(url_table);
 		writeDBStatement.append(" ");
 		writeDBStatement.append("values (?,?,?,default)");
 
@@ -91,7 +85,8 @@ public class DataBaseManager {
 		try {
 			connection = DataBaseManager.getInstance().getConnection();
 			connection.setAutoCommit(false);
-			preparedStatement = connection.prepareStatement(writeDBStatement.toString());
+			preparedStatement = connection.prepareStatement(writeDBStatement
+					.toString());
 			ScrapedURL links = url.getLinks();
 			for (URL link : links.getScrapedLinks()) {
 				preparedStatement.setString(1, url.getURL());
@@ -128,7 +123,8 @@ public class DataBaseManager {
 		try {
 			connection = DataBaseManager.getInstance().getConnection();
 			statement = connection.createStatement();
-			resultSet = statement.executeQuery(SELECT_ALL_RECORDS + " where hashCode=" + url.hashCode());
+			resultSet = statement.executeQuery(SELECT_ALL_RECORDS
+					+ " where hashCode=" + url.hashCode());
 			if (resultSet != null) {
 				urlExists = true;
 			}
@@ -144,19 +140,4 @@ public class DataBaseManager {
 		}
 		return urlExists;
 	}
-
-	// // TODO how to use the dbCache
-	// public void buildDBCache() {
-	// ResultSet resultSet = null;
-	// dbCache = new HashMap<Integer, String>();
-	// resultSet = readData(SELECT_ALL_RECORDS);
-	// try {
-	// while (resultSet.next()) {
-	// dbCache.put(resultSet.getInt(2), resultSet.getString(1));
-	// }
-	// } catch (SQLException e) {
-	// logger.error(e);
-	// }
-	// }
-
 }

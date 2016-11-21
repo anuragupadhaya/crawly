@@ -1,18 +1,9 @@
 package com.eanurag.junit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.eanurag.impl.DataBaseManager;
-import com.eanurag.objects.URL;
 
 public class TestDataBaseManager {
 
-	DataBaseManager dbManager = DataBaseManager.getInstance();
+	/*DataBaseManager dbManager = DataBaseManager.getInstance();
 	private static final String SELECT_ALL_RECORDS = "SELECT * FROM `crawly`.`url`";
 	URL url = new URL();
 
@@ -39,5 +30,5 @@ public class TestDataBaseManager {
 		url.setURL("http://www.lameassdomain.something.wtf.whatever.dude.com");
 		assertEquals(true, dbManager.writeData(url));
 	}
-
+*/
 }
